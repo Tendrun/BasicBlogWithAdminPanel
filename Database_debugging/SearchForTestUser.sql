@@ -1,0 +1,1 @@
+﻿SELECT TOP(1) * FROM AspNetUsers WHERE NormalizedUserName = 'TESTOWY@EMAIL.COM';
