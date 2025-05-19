@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BasicBlogWithAdminPanel.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace BasicBlogWithAdminPanel.Controllers {
     public class AccountController : Controller {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) {
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) {
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -23,8 +25,19 @@ namespace BasicBlogWithAdminPanel.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(string email, string password) {
             if (ModelState.IsValid) {
-                var user = new IdentityUser { UserName = email, Email = email };
+                var user = new ApplicationUser {
+                    UserName = email,
+                    Email = email,
+                    Role = UserRole.User // lub Admin
+                };
+
+                Debug.WriteLine("Przed Tutaj ");
+                Debug.WriteLine($"email: {email}");
+                Debug.WriteLine($"password: {password}");
+
                 var result = await _userManager.CreateAsync(user, password);
+
+                Debug.WriteLine("Tutaj " + result);
 
                 if (result.Succeeded) {
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -48,31 +61,30 @@ namespace BasicBlogWithAdminPanel.Controllers {
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password) {
-            Debug.WriteLine("💬 Otrzymano POST /Account/Login");
+            var user = await _userManager.FindByEmailAsync(email);
 
-            Debug.WriteLine("email " + email + " Password = " + password);
+            if (user != null) {
+                // zapisanie danych do sesji
 
-            if (!ModelState.IsValid) {
-                Debug.WriteLine("❌ ModelState NIE jest valid!");
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, password, isPersistent: false, lockoutOnFailure: false);
+
+                if (result.Succeeded) {
+                    HttpContext.Session.SetString("UserRole", user.Role.ToString());
+                    HttpContext.Session.SetString("Username", user.UserName);
+
+                    if (user.Role == UserRole.Admin) {
+                        return RedirectToAction("Dashboard", "Admin");
+                    } else {
+                        return RedirectToAction("Index", "User");
+                    }
+                }
+
+                ViewBag.Error = "Nieprawidłowy login lub hasło.";
                 return View();
             }
 
-            Debug.WriteLine("✅ ModelState jest valid, próbuję się zalogować...");
-
-            var result = await _signInManager.PasswordSignInAsync(email, password, isPersistent: false, lockoutOnFailure: false);
-
-            Debug.WriteLine(result);
-
-            if (result.Succeeded) {
-                Debug.WriteLine("✅ Użytkownik poprawnie zalogowany.");
-                return RedirectToAction("Index", "Home");
-            } else {
-                Debug.WriteLine("❌ Logowanie nieudane.");
-                ModelState.AddModelError(string.Empty, "Nieprawidłowy login lub hasło.");
-                return View();
-            }
+            ViewBag.Error = "Nieprawidłowy login lub hasło.";
+            return View();
         }
-
-
     }
 }
