@@ -7,17 +7,24 @@
 <h2>Dodaj nowy post</h2>
 
 <form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
     <div class="form-group">
-        <label>Tytuł</label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+        <label>title</label>
+        <input type="title" name="title" asp-for="title" class="form-control" required />
+        <span asp-validation-for="title" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label>Treść</label>
-        <textarea asp-for="Content" class="form-control" rows="5"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
+        <label>content</label>
+        <textarea type="content" name="content" asp-for="content" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="content" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Opublikuj</button>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
