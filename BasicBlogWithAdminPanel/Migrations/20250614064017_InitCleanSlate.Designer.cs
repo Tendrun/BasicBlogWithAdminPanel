@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BasicBlogWithAdminPanel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250524134612_InitCleanSlate")]
+    [Migration("20250614064017_InitCleanSlate")]
     partial class InitCleanSlate
     {
         /// <inheritdoc />
