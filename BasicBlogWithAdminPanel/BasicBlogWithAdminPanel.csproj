@@ -1,18 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+	<!-- ────────────────────────
+       Global project settings
+       ──────────────────────── -->
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- User-secrets & MSBuild tweaks -->
 		<UserSecretsId>aspnet-BasicBlogWithAdminPanel-5d2fdbf7-00e4-471f-8dae-b7613f1101dd</UserSecretsId>
+		<EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+
+		<!-- Keep the root namespace explicit for Razor-localizer -->
+		<RootNamespace>BasicBlogWithAdminPanel</RootNamespace>
 	</PropertyGroup>
 
+	<!-- ────────────────────────
+       NuGet dependencies
+       ──────────────────────── -->
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"    Version="8.0.0"  />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI"                      Version="8.0.0"  />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer"              Version="8.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools"                  Version="8.0.11" />
+	</ItemGroup>
+
+	<!-- ────────────────────────
+       Embedded resource files
+       ──────────────────────── -->
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\SharedResource.en.resx" />
+		<EmbeddedResource Include="Resources\SharedResource.pl.resx" />
 	</ItemGroup>
 
 </Project>

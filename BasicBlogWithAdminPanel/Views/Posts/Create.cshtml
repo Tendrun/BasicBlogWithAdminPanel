@@ -8,23 +8,25 @@
 
 <form asp-action="Create" method="post">
     @Html.AntiForgeryToken()
-    <div class="form-group">
-        <label>title</label>
-        <input type="title" name="title" asp-for="title" class="form-control" required />
-        <span asp-validation-for="title" class="text-danger"></span>
+
+    <!-- pokaż ewentualne błędy walidacji całego modelu -->
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label>content</label>
-        <textarea type="content" name="content" asp-for="content" class="form-control" rows="5"></textarea>
-        <span asp-validation-for="content" class="text-danger"></span>
+    <div class="form-group mb-4">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Opublikuj</button>
 </form>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

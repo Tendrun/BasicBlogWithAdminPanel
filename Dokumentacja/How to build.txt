@@ -2,3 +2,13 @@ Drop-Database
 Remove-Migration
 Add-Migration InitCleanSlate
 Update-Database
+
+
+
+<terminal powershell>
+
+dotnet tool install --global dotnet-ef
+
+dotnet ef migrations remove
+dotnet ef migrations add InitCleanSlate
+dotnet ef database update

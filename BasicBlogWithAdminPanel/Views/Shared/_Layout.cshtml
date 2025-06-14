@@ -1,101 +1,25 @@
-﻿@using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
-@using System.Globalization
-
-<!DOCTYPE html>
-<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] - BasicBlogWithAdminPanel</title>
-
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BasicBlogWithAdminPanel.styles.css" asp-append-version="true" />
+    <title>@L["Welcome"]</title>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    BasicBlogWithAdminPanel
-                </a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mainNav" aria-controls="mainNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse justify-content-between" id="mainNav">
-                    <!-- left nav -->
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                @Localizer["Home"]
-                            </a>
-                        </li>
-
-                        @* Admin link *@
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
-                        {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Admin" asp-action="Dashboard">
-                                @Localizer["Admin"]
-                            </a>
-                        </li>
-                        }
-                    </ul>
-
-                    <!-- right nav -->
-                    <ul class="navbar-nav align-items-center">
-                        <!-- dark-mode -->
-                        <li class="nav-item me-3">
-                            <button id="themeToggle" class="btn btn-outline-secondary"
-                                    title="@Localizer["Toggle Dark Mode"]">
-                                <span id="themeIcon">🌞</span>
-                            </button>
-                        </li>
-
-                        <!-- language -->
-                        <li class="nav-item dropdown me-3">
-                            <a class="nav-link dropdown-toggle" href="#" id="langDropdown"
-                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                @CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToUpper()
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-                                <li><a class="dropdown-item" href="?culture=en">English</a></li>
-                                <li><a class="dropdown-item" href="?culture=pl">Polski</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- login / logout -->
-                        <li class="nav-item">
-                            <partial name="_LoginPartial" />
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <nav>
+            <a href="#">@L["Welcome"]</a>
+            <a href="#">@L["LogoutButton"]</a>
         </nav>
+        <form asp-controller="Language" asp-action="Set" method="get">
+            <select name="culture" onchange="this.form.submit();">
+                <option value="en">English</option>
+                <option value="pl">Polski</option>
+            </select>
+        </form>
+
     </header>
-
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted mt-auto py-3">
-        <div class="container">
-            &copy; 2025 - BasicBlogWithAdminPanel
-        </div>
-    </footer>
-
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/js/theme-toggle.js" asp-append-version="true"></script>
-
-    @await RenderSectionAsync("Scripts", required: false)
+    <main role="main">
+        @RenderBody()
+    </main>
 </body>
 </html>
