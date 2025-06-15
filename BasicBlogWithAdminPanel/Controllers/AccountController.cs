@@ -18,15 +18,14 @@ namespace BasicBlogWithAdminPanel.Controllers
             _signInManager = signInManager;
         }
 
-        // ───────────────── REGISTER ─────────────────
+        // ───────────────────────── REGISTER ─────────────────────────
         public IActionResult Register() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid) return View(model);
 
             var user = new ApplicationUser
             {
@@ -40,7 +39,7 @@ namespace BasicBlogWithAdminPanel.Controllers
             if (result.Succeeded)
             {
                 TempData["RegistrationSuccess"] = true;
-                return RedirectToAction(nameof(Login));   // → /Account/Login
+                return RedirectToAction(nameof(Login));           // → /Account/Login
             }
 
             foreach (var error in result.Errors)
@@ -49,7 +48,7 @@ namespace BasicBlogWithAdminPanel.Controllers
             return View(model);
         }
 
-        // ───────────────── LOGIN ────────────────────
+        // ────────────────────────── LOGIN ───────────────────────────
         public IActionResult Login() => View();
 
         [HttpPost]
@@ -64,7 +63,8 @@ namespace BasicBlogWithAdminPanel.Controllers
             }
 
             var result = await _signInManager.PasswordSignInAsync(
-                user.UserName!, password, isPersistent: false, lockoutOnFailure: false);
+                             user.UserName!, password,
+                             isPersistent: false, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
@@ -78,6 +78,19 @@ namespace BasicBlogWithAdminPanel.Controllers
             return user.Role == UserRole.Admin
                  ? RedirectToAction("Dashboard", "Admin")
                  : RedirectToAction("Index", "User");
+        }
+
+        // ────────────────────────── LOGOUT ──────────────────────────
+        /// <summary>
+        /// Signs the user out, clears the session and shows a friendly
+        /// “logged-out” screen with links to log in or register again.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();   // remove auth-cookie
+            HttpContext.Session.Clear();           // wipe custom session keys
+            return View();                         // → /Views/Account/Logout.cshtml
         }
     }
 }
