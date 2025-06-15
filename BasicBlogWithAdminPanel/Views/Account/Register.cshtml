@@ -1,21 +1,36 @@
-﻿@{
+﻿@model BasicBlogWithAdminPanel.Models.RegisterViewModel
+<!-- namespace fixed; comment moved onto its own line -->
+
+@{
     ViewData["Title"] = L["RegisterTitle"];
 }
 
-<h2>@L["RegisterTitle"]</h2>
+<h1 class="mb-4">@L["RegisterTitle"]</h1>
 
-<form asp-action="Register" method="post">
+<!-- Show this only when *real* ModelState errors exist -->
+<div asp-validation-summary="All"
+     class="alert alert-danger d-none"></div>
+
+<form asp-action="Register" method="post" class="w-50">
     @Html.AntiForgeryToken()
 
-    <div class="form-group">
-        <label>@L["Email"]</label>
-        <input name="email" class="form-control" required />
+    <!-- ── email ─────────────────────────────────────────────────────────── -->
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label>@L["Password"]</label>
-        <input type="password" name="password" class="form-control" required />
+    <!-- ── password ──────────────────────────────────────────────────────── -->
+    <div class="mb-4">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" type="password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">@L["RegisterBtn"]</button>
 </form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

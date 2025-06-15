@@ -1,7 +1,6 @@
 ﻿using BasicBlogWithAdminPanel.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace BasicBlogWithAdminPanel.Controllers
@@ -19,46 +18,38 @@ namespace BasicBlogWithAdminPanel.Controllers
             _signInManager = signInManager;
         }
 
-        // ──────────────────────────────────────────────────────────────────────────────
-        //  REGISTER
-        // ──────────────────────────────────────────────────────────────────────────────
+        // ───────────────── REGISTER ─────────────────
         public IActionResult Register() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(string email, string password)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid)
+                return View(model);
 
             var user = new ApplicationUser
             {
-                UserName = email,
-                Email = email,
+                UserName = model.Email,
+                Email = model.Email,
                 Role = UserRole.User
             };
 
-            var result = await _userManager.CreateAsync(user, password);
+            var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-
-                // ✅ Set TempData flag
-                TempData["ShowWelcomePopup"] = true;
-
-                // ✅ Redirect to user dashboard
-                return RedirectToAction("Index", "User");
+                TempData["RegistrationSuccess"] = true;
+                return RedirectToAction(nameof(Login));   // → /Account/Login
             }
 
             foreach (var error in result.Errors)
                 ModelState.AddModelError(string.Empty, error.Description);
 
-            return View();
+            return View(model);
         }
 
-        // ──────────────────────────────────────────────────────────────────────────────
-        //  LOGIN
-        // ──────────────────────────────────────────────────────────────────────────────
+        // ───────────────── LOGIN ────────────────────
         public IActionResult Login() => View();
 
         [HttpPost]
@@ -66,15 +57,14 @@ namespace BasicBlogWithAdminPanel.Controllers
         public async Task<IActionResult> Login(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user == null)
+            if (user is null)
             {
                 ViewBag.Error = "Nieprawidłowy login lub hasło.";
                 return View();
             }
 
             var result = await _signInManager.PasswordSignInAsync(
-                             user.UserName!, password,
-                             isPersistent: false, lockoutOnFailure: false);
+                user.UserName!, password, isPersistent: false, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
@@ -86,8 +76,8 @@ namespace BasicBlogWithAdminPanel.Controllers
             HttpContext.Session.SetString("Username", user.UserName!);
 
             return user.Role == UserRole.Admin
-                ? RedirectToAction("Dashboard", "Admin")
-                : RedirectToAction("Index", "User");
+                 ? RedirectToAction("Dashboard", "Admin")
+                 : RedirectToAction("Index", "User");
         }
     }
 }
