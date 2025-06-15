@@ -6,4 +6,22 @@
 	<data name="LogoutButton" xml:space="preserve">
     <value>Logout</value>
   </data>
+	<data name="WelcomeTitle" xml:space="preserve">
+    <value>Welcome, {0}!</value>
+  </data>
+	<data name="WelcomeSubtitle" xml:space="preserve">
+    <value>This is your personal dashboard.</value>
+  </data>
+	<data name="RegisterTitle" xml:space="preserve">
+    <value>Register</value>
+  </data>
+	<data name="RegisterBtn" xml:space="preserve">
+    <value>Register</value>
+  </data>
+	<data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+	<data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
 </root>

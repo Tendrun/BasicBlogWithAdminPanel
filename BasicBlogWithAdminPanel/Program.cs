@@ -1,79 +1,69 @@
-using BasicBlogWithAdminPanel.Data;
+﻿using BasicBlogWithAdminPanel.Data;
 using BasicBlogWithAdminPanel.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ----------  DB + Identity ----------
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                      ?? throw new InvalidOperationException("DefaultConnection not found");
-builder.Services.AddDbContext<ApplicationDbContext>(opt => opt.UseSqlServer(connectionString));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+// ──────────────────────────────
+// Add services
+// ──────────────────────────────
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(opts =>
-{
-    opts.SignIn.RequireConfirmedAccount = false;
-    opts.Password.RequireDigit = true;
-    opts.Password.RequireLowercase = true;
-    opts.Password.RequireUppercase = true;
-    opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequiredLength = 6;
-}).AddRoles<IdentityRole>()
-  .AddEntityFrameworkStores<ApplicationDbContext>();
+// Add EF Core and Identity
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ----------  Localisation ----------
-builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// Add localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
 builder.Services.AddControllersWithViews()
-                .AddViewLocalization()
-                .AddDataAnnotationsLocalization();
-builder.Services.AddRazorPages()
-                .AddViewLocalization()
-                .AddDataAnnotationsLocalization();
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
 
-var supportedCultures = new[] { "en", "pl" };
-builder.Services.Configure<RequestLocalizationOptions>(opts =>
+// Add session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
 {
-    opts.SetDefaultCulture("en")
-        .AddSupportedCultures(supportedCultures)
-        .AddSupportedUICultures(supportedCultures);
-    // allow culture switching via ?culture=xx
-    opts.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
 
-// ----------  Misc ----------
-builder.Services.AddSession();
+// Localization options
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("pl") };
+    options.DefaultRequestCulture = new RequestCulture("en");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    options.FallBackToParentUICultures = true;
+    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+});
 
 var app = builder.Build();
 
-// ----------  Pipeline ----------
-if (app.Environment.IsDevelopment())
-{
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+// ──────────────────────────────
+// Middleware
+// ──────────────────────────────
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
+app.UseRequestLocalization();
 app.UseSession();
-app.UseAuthentication();
+
+app.UseAuthentication(); // 🛠️ Needed for Identity to work
 app.UseAuthorization();
 
-// MVC + Razor Pages
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
 
 app.Run();

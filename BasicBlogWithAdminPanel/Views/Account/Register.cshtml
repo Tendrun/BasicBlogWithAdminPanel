@@ -1,18 +1,21 @@
 ﻿@{
-    ViewData["Title"] = "Rejestracja";
+    ViewData["Title"] = L["RegisterTitle"];
 }
 
-<h2>Rejestracja</h2>
+<h2>@L["RegisterTitle"]</h2>
 
 <form asp-action="Register" method="post">
     @Html.AntiForgeryToken()
+
     <div class="form-group">
-        <label>Email</label>
+        <label>@L["Email"]</label>
         <input name="email" class="form-control" required />
     </div>
+
     <div class="form-group">
-        <label>Hasło</label>
+        <label>@L["Password"]</label>
         <input type="password" name="password" class="form-control" required />
     </div>
-    <button type="submit" class="btn btn-primary">Zarejestruj się</button>
+
+    <button type="submit" class="btn btn-primary">@L["RegisterBtn"]</button>
 </form>

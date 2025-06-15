@@ -3,9 +3,34 @@
 
 @{
     ViewData["Title"] = Localizer["PageTitle"];
-    // Use ViewBag.Username if the controller sets it; fall back to Identity name.
     var userName = (ViewBag.Username as string) ?? User.Identity?.Name ?? "";
 }
 
 <h2>@Localizer["WelcomeTitle", userName]</h2>
 <p>@Localizer["WelcomeSubtitle"]</p>
+
+@if (TempData["ShowWelcomePopup"] is true)
+{
+<div class="modal fade show" id="registerModal" tabindex="-1" role="dialog" style="display:block; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h5 class="modal-title">Welcome!</h5>
+            </div>
+            <div class="modal-body">
+                <p>You have successfully registered! 🎉</p>
+            </div>
+            <div class="modal-footer">
+                <a href="/Posts" class="btn btn-primary">Go to Posts</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        setTimeout(() => {
+            const modal = document.getElementById("registerModal");
+            if (modal) modal.style.display = "none";
+        }, 3000);
+</script>
+}

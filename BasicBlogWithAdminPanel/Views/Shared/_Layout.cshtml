@@ -1,23 +1,32 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+    var culture = System.Globalization.CultureInfo.CurrentUICulture;
+}
+
+<!DOCTYPE html>
+<html lang="@culture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>@L["Welcome"]</title>
 </head>
 <body>
     <header>
         <nav>
-            <a href="#">@L["Welcome"]</a>
-            <a href="#">@L["LogoutButton"]</a>
+            <a href="/">@L["Welcome"]</a>
+            <a href="/Account/Logout">@L["LogoutButton"]</a>
         </nav>
+
         <form asp-controller="Language" asp-action="Set" method="get">
+            <input type="hidden"
+                   name="returnUrl"
+                   value="@Context.Request.Path@Context.Request.QueryString" />
             <select name="culture" onchange="this.form.submit();">
-                <option value="en">English</option>
-                <option value="pl">Polski</option>
+                <option value="en" selected="@(culture.Name == "en")">English</option>
+                <option value="pl" selected="@(culture.Name == "pl")">Polski</option>
             </select>
         </form>
-
     </header>
+
     <main role="main">
         @RenderBody()
     </main>
