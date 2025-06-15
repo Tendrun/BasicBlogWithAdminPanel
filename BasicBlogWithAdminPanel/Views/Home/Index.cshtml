@@ -1,1 +1,34 @@
-﻿<a href="/Posts">Zobacz posty</a>
+﻿@{
+    ViewData["Title"] = L["Welcome"];
+    var userName = (ViewBag.Username as string) ?? User.Identity?.Name ?? "";
+}
+
+<h2>@L["WelcomeTitle", userName]</h2>
+<p>@L["WelcomeSubtitle"]</p>
+
+@if (TempData["ShowWelcomePopup"] is true)
+{
+<div class="modal fade show" id="registerModal" tabindex="-1" role="dialog"
+     style="display:block; background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content p-4">
+            <div class="modal-header">
+                <h5 class="modal-title">@L["RegisterSuccessTitle"]</h5>
+            </div>
+            <div class="modal-body">
+                <p>@L["RegisterSuccessBody"]</p>
+            </div>
+            <div class="modal-footer">
+                <a href="/Posts" class="btn btn-primary">@L["GoToPosts"]</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        setTimeout(() => {
+            const modal = document.getElementById("registerModal");
+            if (modal) modal.style.display = "none";
+        }, 3000);
+</script>
+}

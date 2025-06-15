@@ -1,8 +1,11 @@
 namespace BasicBlogWithAdminPanel
 {
     /// <summary>
-    /// Marker class used by IStringLocalizer to load shared resource files
-    /// (Resources/SharedResource.<culture>.resx).
+    /// Empty “marker” class so <see cref="Microsoft.Extensions.Localization.IStringLocalizer" />
+    /// can locate the satellite resource files:
+    ///
+    ///     Resources/SharedResource.en.resx
+    ///     Resources/SharedResource.pl.resx
     /// </summary>
     public class SharedResource { }
 }

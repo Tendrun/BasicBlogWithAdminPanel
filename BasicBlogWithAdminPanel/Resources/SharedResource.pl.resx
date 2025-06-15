@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-	<data name="Welcome" xml:space="preserve">
-    <value>Witaj</value>
-  </data>
-	<data name="LogoutButton" xml:space="preserve">
-    <value>Wyloguj się</value>
-  </data>
-	<data name="WelcomeTitle" xml:space="preserve">
-    <value>Witaj, {0}!</value>
-  </data>
-	<data name="WelcomeSubtitle" xml:space="preserve">
-    <value>To jest Twój osobisty panel.</value>
-  </data>
-	<data name="RegisterTitle" xml:space="preserve">
-    <value>Rejestracja</value>
-  </data>
-	<data name="Email" xml:space="preserve">
-    <value>Email</value>
-  </data>
-	<data name="Password" xml:space="preserve">
-    <value>Hasło</value>
-  </data>
-	<data name="RegisterBtn" xml:space="preserve">
-    <value>Zarejestruj się</value>
-  </data>
+	<!-- NAV & GENERIC -->
+	<data name="Welcome"           xml:space="preserve"><value>Witaj</value></data>
+	<data name="LogoutButton"      xml:space="preserve"><value>Wyloguj się</value></data>
+	<data name="LanguageEnglish"   xml:space="preserve"><value>English</value></data>
+	<data name="LanguagePolish"    xml:space="preserve"><value>Polski</value></data>
+
+	<!-- HOME / USER -->
+	<data name="WelcomeTitle"      xml:space="preserve"><value>Witaj, {0}!</value></data>
+	<data name="WelcomeSubtitle"   xml:space="preserve"><value>To jest Twój panel.</value></data>
+	<data name="RegisterSuccessTitle" xml:space="preserve"><value>Witaj!</value></data>
+	<data name="RegisterSuccessBody"  xml:space="preserve"><value>Rejestracja zakończona sukcesem! 🎉</value></data>
+	<data name="GoToPosts"         xml:space="preserve"><value>Przejdź do postów</value></data>
+
+	<!-- AUTHENTICATION -->
+	<data name="RegisterTitle"     xml:space="preserve"><value>Rejestracja</value></data>
+	<data name="Email"             xml:space="preserve"><value>Email</value></data>
+	<data name="Password"          xml:space="preserve"><value>Hasło</value></data>
+	<data name="RegisterBtn"       xml:space="preserve"><value>Zarejestruj się</value></data>
+	<data name="LoginTitle"        xml:space="preserve"><value>Logowanie</value></data>
+	<data name="LoginBtn"          xml:space="preserve"><value>Zaloguj się</value></data>
+
+	<!-- POSTS -->
+	<data name="AllPostsTitle"     xml:space="preserve"><value>Wszystkie posty</value></data>
+	<data name="TitleHeader"       xml:space="preserve"><value>Tytuł</value></data>
+	<data name="AuthorHeader"      xml:space="preserve"><value>Autor</value></data>
+	<data name="CreatedAtHeader"   xml:space="preserve"><value>Data</value></data>
+	<data name="ActionsHeader"     xml:space="preserve"><value>Akcje</value></data>
+	<data name="DeleteConfirm"     xml:space="preserve"><value>Czy na pewno?</value></data>
+	<data name="CreatePostTitle"   xml:space="preserve"><value>Dodaj nowy post</value></data>
+	<data name="CreatePostBtn"     xml:space="preserve"><value>Opublikuj</value></data>
+
+	<!-- ADMIN -->
+	<data name="AdminDashboardTitle" xml:space="preserve"><value>Panel administratora</value></data>
+	<data name="AdminWelcome"        xml:space="preserve"><value>Witaj administratorze, {0}!</value></data>
 </root>
