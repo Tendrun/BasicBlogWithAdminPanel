@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BasicBlogWithAdminPanel.Models
 {
-    public class Post
+    public class Comment
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
-        public string Title { get; set; } = default!;
+        /* FK must match Post.Id type (int) */
+        [ForeignKey(nameof(Post))]
+        public int PostId { get; set; }
 
         [Required]
         public string Content { get; set; } = default!;
@@ -17,9 +18,7 @@ namespace BasicBlogWithAdminPanel.Models
         public string Author { get; set; } = default!;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public bool IsDeleted { get; set; } = false;
-
-        /* NEW — one-to-many */
-        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        /* navigation */
+        public Post? Post { get; set; }
     }
 }

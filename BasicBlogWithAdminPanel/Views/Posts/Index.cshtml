@@ -1,5 +1,5 @@
 ﻿@model List<BasicBlogWithAdminPanel.Models.Post>
-    @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+    @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery AntiF
     @{
     ViewData["Title"] = L["AllPostsTitle"];
     var role = ViewData["UserRole"] as string;
@@ -7,40 +7,60 @@
 
     <h2>@L["AllPostsTitle"]</h2>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>@L["TitleHeader"]</th>
-                <th>@L["AuthorHeader"]</th>
-                <th>@L["CreatedAtHeader"]</th>
-                @if (role == "Admin")
+    @foreach (var p in Model)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-1">@p.Title</h5>
+            <small class="text-muted">
+                @p.Author • @p.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+            </small>
+
+            <p class="mt-2">@p.Content</p>
+
+            @* owner OR admin can delete *@
+            @if (role == "Admin" ||
+                p.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
             {
-                <th>@L["ActionsHeader"]</th>
+            <form asp-action="Delete"
+                  asp-route-id="@p.Id"
+                  method="post"
+                  class="d-inline">
+                <input type="hidden"
+                       name="__RequestVerificationToken"
+                       value="@AntiF.GetTokens(Context).RequestToken" />
+                <button class="btn btn-link p-0 text-danger"
+                        title="Delete">
+                    🗑️
+                </button>
+            </form>
             }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var post in Model)
-        {
-            <tr>
-                <td>@post.Title</td>
-                <td>@post.Author</td>
-                <td>@post.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                @if (role == "Admin")
-                {
-                <form method="post" asp-action="Delete" asp-route-id="@post.Id" style="display:inline;">
-                    <input name="__RequestVerificationToken"
-                           type="hidden"
-                           value="@Antiforgery.GetTokens(Context).RequestToken" />
-                    <button type="submit"
-                            class="btn btn-link text-danger"
-                            title="Delete"
-                            onclick="return confirm('@L["DeleteConfirm"]');">
-                        ❌
-                    </button>
-                </form>
-                }
-            </tr>
-        }
-        </tbody>
-    </table>
+
+            <hr />
+
+            @* comments *@
+            @foreach (var c in p.Comments)
+            {
+            <div class="mb-2">
+                <strong>@c.Author</strong>:
+                @c.Content
+                <small class="text-muted">
+                    (@c.CreatedAt.ToString("dd.MM.yyyy HH:mm"))
+                </small>
+            </div>
+            }
+
+            @* add comment *@
+            <form asp-action="AddComment"
+                  method="post"
+                  class="d-flex gap-2">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="postId" value="@p.Id" />
+                <input name="content"
+                       class="form-control"
+                       placeholder="Add a comment…" required />
+                <button class="btn btn-primary">Reply</button>
+            </form>
+        </div>
+    </div>
+}
