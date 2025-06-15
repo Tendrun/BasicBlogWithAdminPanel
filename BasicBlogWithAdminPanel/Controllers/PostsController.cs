@@ -17,12 +17,11 @@ namespace BasicBlogWithAdminPanel.Controllers
             _um = um;
         }
 
-        // ───────── LIST ─────────
+        // ───────────────────────── LIST ─────────────────────────
         public async Task<IActionResult> Index()
         {
             var role = HttpContext.Session.GetString("UserRole");
-            if (role is null)
-                return Unauthorized("You must be logged in.");
+            if (role is null) return Unauthorized("You must be logged in.");
 
             var posts = await _db.Posts
                                  .Where(p => !p.IsDeleted)
@@ -31,44 +30,123 @@ namespace BasicBlogWithAdminPanel.Controllers
                                  .ToListAsync();
 
             ViewData["UserRole"] = role;
-            return View(posts);              // View now expects List<Post>
+            return View(posts);
         }
 
-        // ───────── ADD-COMMENT ─────────
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(int postId, string content)
+        // ─────────────────────── CREATE (form) ───────────────────────
+        [HttpGet]
+        public IActionResult Create()
         {
-            if (string.IsNullOrWhiteSpace(content))
-                return BadRequest();
+            if (!User.Identity!.IsAuthenticated)
+                return Unauthorized("You must be logged in.");
 
-            if (!_db.Posts.Any(p => p.Id == postId && !p.IsDeleted))
-                return NotFound();
+            return View();                           // Views/Posts/Create.cshtml
+        }
 
-            var comment = new Comment
+        // ─────────────────────── CREATE (submit) ─────────────────────
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Title,Content")] Post input)
+        {
+            ModelState.Remove("Author");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("IsDeleted");
+            ModelState.Remove("Comments");
+
+            if (!ModelState.IsValid) return View(input);
+
+            var post = new Post
             {
-                PostId = postId,
-                Content = content.Trim(),
-                Author = User.Identity?.Name ?? "anonymous"
+                Title = input.Title.Trim(),
+                Content = input.Content.Trim(),
+                Author = User.Identity!.Name ?? "anonymous",
+                CreatedAt = DateTime.UtcNow
             };
-            _db.Comments.Add(comment);
+
+            _db.Posts.Add(post);
             await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        // ───────── DELETE POST (owner or admin) ─────────
+        // ────────────────── ADD COMMENT ──────────────────
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int postId, string content)
+        {
+            if (string.IsNullOrWhiteSpace(content)) return BadRequest();
+            if (!_db.Posts.Any(p => p.Id == postId && !p.IsDeleted)) return NotFound();
+
+            _db.Comments.Add(new Comment
+            {
+                PostId = postId,
+                Content = content.Trim(),
+                Author = User.Identity?.Name ?? "anonymous"
+            });
+
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ────────────────── EDIT (form) ──────────────────
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var post = await _db.Posts.FindAsync(id);
+            if (post == null || post.IsDeleted) return NotFound();
+
+            var role = HttpContext.Session.GetString("UserRole");
+            var author = User.Identity?.Name ?? "";
+
+            if (role != "Admin" &&
+                !post.Author.Equals(author, StringComparison.OrdinalIgnoreCase))
+                return Unauthorized();
+
+            return View(post);          // Views/Posts/Edit.cshtml
+        }
+
+        // ─────────────── EDIT (submit) ───────────────
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([Bind("Id,Title,Content")] Post input)
+        {
+            ModelState.Remove("Author");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("IsDeleted");
+            ModelState.Remove("Comments");
+
+            if (!ModelState.IsValid) return View(input);
+
+            var post = await _db.Posts.FindAsync(input.Id);
+            if (post == null || post.IsDeleted) return NotFound();
+
+            var role = HttpContext.Session.GetString("UserRole");
+            var author = User.Identity?.Name ?? "";
+
+            if (role != "Admin" &&
+                !post.Author.Equals(author, StringComparison.OrdinalIgnoreCase))
+                return Unauthorized();
+
+            post.Title = input.Title.Trim();
+            post.Content = input.Content.Trim();
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ─────────── DELETE (owner or admin) ───────────
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var role = HttpContext.Session.GetString("UserRole");
             var post = await _db.Posts.FindAsync(id);
-            if (post is null) return NotFound();
+            if (post == null) return NotFound();
 
-            if (role != "Admin" && !post.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
+            if (role != "Admin" &&
+                !post.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
                 return Unauthorized();
 
-            _db.Posts.Remove(post);
+            // soft-delete so comments/history survive
+            post.IsDeleted = true;
             await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }

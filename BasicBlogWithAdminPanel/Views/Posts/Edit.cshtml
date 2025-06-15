@@ -1,5 +1,33 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model BasicBlogWithAdminPanel.Models.Post
 @{
+    ViewData["Title"] = "Edit post";
+}
+
+<h2 class="mb-4">Edit post</h2>
+
+<form asp-action="Edit" asp-controller="Posts" method="post" class="w-50">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="Id" />
+
+    <!-- ── Title ─────────────────────────────────────────────── -->
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <!-- ── Content ───────────────────────────────────────────── -->
+    <div class="mb-4">
+        <label asp-for="Content" class="form-label"></label>
+        <textarea asp-for="Content" rows="8" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

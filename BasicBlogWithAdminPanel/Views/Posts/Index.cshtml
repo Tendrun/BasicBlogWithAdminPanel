@@ -1,5 +1,4 @@
 ﻿@model List<BasicBlogWithAdminPanel.Models.Post>
-    @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery AntiF
     @{
     ViewData["Title"] = L["AllPostsTitle"];
     var role = ViewData["UserRole"] as string;
@@ -18,18 +17,22 @@
 
             <p class="mt-2">@p.Content</p>
 
-            @* owner OR admin can delete *@
+            @* owner OR admin can edit/delete *@
             @if (role == "Admin" ||
                 p.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
             {
+            <a asp-action="Edit"
+               asp-route-id="@p.Id"
+               class="btn btn-link p-0 me-2"
+               title="Edit">✏️</a>
+
             <form asp-action="Delete"
                   asp-route-id="@p.Id"
                   method="post"
                   class="d-inline">
-                <input type="hidden"
-                       name="__RequestVerificationToken"
-                       value="@AntiF.GetTokens(Context).RequestToken" />
-                <button class="btn btn-link p-0 text-danger"
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="btn btn-link p-0 text-danger"
                         title="Delete">
                     🗑️
                 </button>
