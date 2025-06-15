@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BasicBlogWithAdminPanel.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250615151133_InitWithComments")]
-    partial class InitWithComments
+    [Migration("20250615171914_InitCleanSlate")]
+    partial class InitCleanSlate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

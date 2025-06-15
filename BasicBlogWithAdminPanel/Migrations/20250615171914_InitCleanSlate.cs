@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BasicBlogWithAdminPanel.Migrations
 {
     /// <inheritdoc />
-    public partial class InitWithComments : Migration
+    public partial class InitCleanSlate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
