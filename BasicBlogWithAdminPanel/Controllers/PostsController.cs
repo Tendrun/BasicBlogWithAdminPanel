@@ -40,13 +40,14 @@ namespace BasicBlogWithAdminPanel.Controllers
             if (!User.Identity!.IsAuthenticated)
                 return Unauthorized("You must be logged in.");
 
-            return View();   // Views/Posts/Create.cshtml
+            return View();                           // Views/Posts/Create.cshtml
         }
 
         // ─────────────────────── CREATE (submit) ─────────────────────
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,Content")] Post input)
         {
+            // remove fields that are not posted so validation passes
             ModelState.Remove("Author");
             ModelState.Remove("CreatedAt");
             ModelState.Remove("IsDeleted");
@@ -54,16 +55,18 @@ namespace BasicBlogWithAdminPanel.Controllers
 
             if (!ModelState.IsValid) return View(input);
 
-            _db.Posts.Add(new Post
+            var post = new Post
             {
                 Title = input.Title.Trim(),
                 Content = input.Content.Trim(),
                 Author = User.Identity!.Name ?? "anonymous",
                 CreatedAt = DateTime.UtcNow
-            });
+            };
 
+            _db.Posts.Add(post);
             await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Index));   // ← back to list
         }
 
         // ────────────────── ADD COMMENT ──────────────────
@@ -129,7 +132,7 @@ namespace BasicBlogWithAdminPanel.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ─────────── DELETE POST ───────────
+        // ─────────── DELETE POST (owner or admin) ───────────
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
@@ -146,21 +149,15 @@ namespace BasicBlogWithAdminPanel.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ─────────── DELETE COMMENT ───────────
+        // ─────────── DELETE COMMENT (admin only) ───────────
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteComment(int id)
         {
-            var comment = await _db.Comments
-                                   .Include(c => c.Post)
-                                   .FirstOrDefaultAsync(c => c.Id == id);
-            if (comment == null) return NotFound();
-
             var role = HttpContext.Session.GetString("UserRole");
-            var currentUser = User.Identity?.Name ?? "";
+            if (role != "Admin") return Unauthorized();
 
-            if (role != "Admin" &&
-                !comment.Author.Equals(currentUser, StringComparison.OrdinalIgnoreCase))
-                return Unauthorized();
+            var comment = await _db.Comments.FindAsync(id);
+            if (comment == null) return NotFound();
 
             _db.Comments.Remove(comment);
             await _db.SaveChangesAsync();

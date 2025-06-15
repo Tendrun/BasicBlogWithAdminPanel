@@ -17,7 +17,7 @@
 
             <p class="mt-2">@p.Content</p>
 
-            @* owner OR admin can edit/delete *@
+            @* ─── akcje na poście ───────────────────────────────────── *@
             @if (role == "Admin" ||
                 p.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
             {
@@ -31,9 +31,8 @@
                   method="post"
                   class="d-inline">
                 @Html.AntiForgeryToken()
-                <button type="submit"
-                        class="btn btn-link p-0 text-danger"
-                        title="Delete">
+                <button class="btn btn-link p-0 text-danger"
+                        title="Delete post">
                     🗑️
                 </button>
             </form>
@@ -41,19 +40,35 @@
 
             <hr />
 
-            @* comments *@
+            @* ─── komentarze ────────────────────────────────────────── *@
             @foreach (var c in p.Comments)
             {
-            <div class="mb-2">
-                <strong>@c.Author</strong>:
-                @c.Content
-                <small class="text-muted">
-                    (@c.CreatedAt.ToString("dd.MM.yyyy HH:mm"))
-                </small>
+            <div class="mb-2 d-flex justify-content-between">
+                <div>
+                    <strong>@c.Author</strong>:
+                    @c.Content
+                    <small class="text-muted">
+                        (@c.CreatedAt.ToString("dd.MM.yyyy HH:mm"))
+                    </small>
+                </div>
+
+                @if (role == "Admin")
+                    {
+                <form asp-action="DeleteComment"
+                      asp-route-id="@c.Id"
+                      method="post"
+                      class="ms-2">
+                    @Html.AntiForgeryToken()
+                    <button class="btn btn-link p-0 text-danger"
+                            title="Delete comment">
+                        🗑️
+                    </button>
+                </form>
+                    }
             </div>
             }
 
-            @* add comment *@
+            @* ─── dodaj komentarz ───────────────────────────────────── *@
             <form asp-action="AddComment"
                   method="post"
                   class="d-flex gap-2">
