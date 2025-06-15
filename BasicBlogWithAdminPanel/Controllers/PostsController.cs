@@ -40,7 +40,7 @@ namespace BasicBlogWithAdminPanel.Controllers
             if (!User.Identity!.IsAuthenticated)
                 return Unauthorized("You must be logged in.");
 
-            return View();                           // Views/Posts/Create.cshtml
+            return View();   // Views/Posts/Create.cshtml
         }
 
         // ─────────────────────── CREATE (submit) ─────────────────────
@@ -54,17 +54,15 @@ namespace BasicBlogWithAdminPanel.Controllers
 
             if (!ModelState.IsValid) return View(input);
 
-            var post = new Post
+            _db.Posts.Add(new Post
             {
                 Title = input.Title.Trim(),
                 Content = input.Content.Trim(),
                 Author = User.Identity!.Name ?? "anonymous",
                 CreatedAt = DateTime.UtcNow
-            };
+            });
 
-            _db.Posts.Add(post);
             await _db.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
 
@@ -131,7 +129,7 @@ namespace BasicBlogWithAdminPanel.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // ─────────── DELETE (owner or admin) ───────────
+        // ─────────── DELETE POST ───────────
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
@@ -143,10 +141,29 @@ namespace BasicBlogWithAdminPanel.Controllers
                 !post.Author.Equals(User.Identity!.Name, StringComparison.OrdinalIgnoreCase))
                 return Unauthorized();
 
-            // soft-delete so comments/history survive
-            post.IsDeleted = true;
+            _db.Posts.Remove(post);
             await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
+        // ─────────── DELETE COMMENT ───────────
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteComment(int id)
+        {
+            var comment = await _db.Comments
+                                   .Include(c => c.Post)
+                                   .FirstOrDefaultAsync(c => c.Id == id);
+            if (comment == null) return NotFound();
+
+            var role = HttpContext.Session.GetString("UserRole");
+            var currentUser = User.Identity?.Name ?? "";
+
+            if (role != "Admin" &&
+                !comment.Author.Equals(currentUser, StringComparison.OrdinalIgnoreCase))
+                return Unauthorized();
+
+            _db.Comments.Remove(comment);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

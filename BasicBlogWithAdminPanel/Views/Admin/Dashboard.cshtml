@@ -3,4 +3,32 @@
 }
 
 <h2>@L["AdminWelcome", ViewBag.Username]</h2>
-<p>@L["AdminDashboardTitle"]</p>
+
+<div class="row my-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <p class="display-6">@ViewBag.TotalUsers</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Posts</h5>
+                <p class="display-6">@ViewBag.TotalPosts</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Comments</h5>
+                <p class="display-6">@ViewBag.TotalComments</p>
+            </div>
+        </div>
+    </div>
+</div>

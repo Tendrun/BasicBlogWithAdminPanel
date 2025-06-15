@@ -1,6 +1,7 @@
 ﻿@{
     var culture         = System.Globalization.CultureInfo.CurrentUICulture;
     var isAuthenticated = Context.User.Identity?.IsAuthenticated ?? false;
+    var userRole        = Context.Session.GetString("UserRole");   // "Admin" | "User" | null
 }
 
 <!DOCTYPE html>
@@ -28,7 +29,14 @@
                 @if (isAuthenticated)
                 {
                 <a class="nav-link" href="/Posts">@L["AllPostsTitle"]</a>
-                @* add more primary nav items here if you need *@
+
+                @* show only for admins *@
+                @if (userRole == "Admin")
+                    {
+                <a class="nav-link" href="/Admin/Dashboard">
+                    @L["AdminDashboardTitle"]
+                </a>
+                    }
                 }
             </div>
 
