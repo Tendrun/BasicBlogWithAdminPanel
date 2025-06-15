@@ -1,5 +1,6 @@
 ﻿@{
-    var culture = System.Globalization.CultureInfo.CurrentUICulture;
+    var culture         = System.Globalization.CultureInfo.CurrentUICulture;
+    var isAuthenticated = Context.User.Identity?.IsAuthenticated ?? false;
 }
 
 <!DOCTYPE html>
@@ -7,28 +8,86 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>@L["Welcome"]</title>
-</head>
-<body>
-    <header>
-        <nav>
-            <a href="/">@L["Welcome"]</a>
-            <a href="/Account/Logout">@L["LogoutButton"]</a>
-        </nav>
 
-        <form asp-controller="Language" asp-action="Set" method="get">
-            <input type="hidden"
-                   name="returnUrl"
-                   value="@Context.Request.Path@Context.Request.QueryString" />
-            <select name="culture" onchange="this.form.submit();">
-                <option value="en" selected="@(culture.Name == "en")">English</option>
-                <option value="pl" selected="@(culture.Name == "pl")">Polski</option>
-            </select>
-        </form>
+    <title>@ViewData["Title"] - BasicBlog</title>
+
+    <!-- ---- CSS ------------------------------------ -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+    <!-- ────────────────────────────── NAVBAR ────────────────────────────── -->
+    <header>
+        <nav class="navbar px-3">
+            <!-- left side: brand & main links -->
+            <div class="d-flex align-items-center gap-3">
+                <a class="navbar-brand fw-semibold" href="/">@L["Welcome"]</a>
+
+                @if (isAuthenticated)
+                {
+                <a class="nav-link" href="/Posts">@L["AllPostsTitle"]</a>
+                @* add more primary nav items here if you need *@
+                }
+            </div>
+
+            <!-- right side: language, theme toggle, auth link -->
+            <div class="d-flex align-items-center gap-3">
+
+                <!-- language switch -->
+                <form asp-controller="Language"
+                      asp-action="Set"
+                      method="get"
+                      class="m-0">
+                    <input type="hidden"
+                           name="returnUrl"
+                           value="@Context.Request.Path@Context.Request.QueryString" />
+
+                    <select name="culture"
+                            class="form-select form-select-sm"
+                            onchange="this.form.submit();">
+                        <option value="en" selected="@(culture.Name == "en")">
+                            @L["LanguageEnglish"]
+                        </option>
+                        <option value="pl" selected="@(culture.Name == "pl")">
+                            @L["LanguagePolish"]
+                        </option>
+                    </select>
+                </form>
+
+                <!-- dark-mode toggle -->
+                <button id="themeToggle"
+                        type="button"
+                        class="btn btn-link p-0"
+                        title="Toggle theme">
+                    <span id="themeIcon" style="font-size:1.35rem;"></span>
+                </button>
+
+                <!-- auth link -->
+                @if (isAuthenticated)
+                {
+                <a class="nav-link" href="/Account/Logout">@L["LogoutButton"]</a>
+                }
+                else
+                {
+                <a class="nav-link" href="/Account/Login">@L["LoginBtn"]</a>
+                }
+            </div>
+        </nav>
     </header>
 
-    <main role="main">
+    <!-- ────────────────────────────── MAIN CONTENT ──────────────────────── -->
+    <main role="main" class="container py-4">
         @RenderBody()
     </main>
+
+    <!-- ---- JS ------------------------------------ -->
+    <script defer
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script defer src="~/js/theme-toggle.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
